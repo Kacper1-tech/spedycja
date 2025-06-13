@@ -46,6 +46,12 @@ def add_data(module):
             data = json.load(f)
     except json.JSONDecodeError:
         data = []
+
+    # ✅ Automatyczne nadanie unikalnego lp tylko dla zleceń
+    if module == 'zlecenia':
+        max_lp = max((item.get("lp", 0) for item in data if isinstance(item.get("lp", 0), int)), default=0)
+        new_data["lp"] = max_lp + 1
+
     data.append(new_data)
     with open(DATA_FILES[module], 'w') as f:
         json.dump(data, f, indent=2)
