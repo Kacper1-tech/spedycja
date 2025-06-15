@@ -9,9 +9,8 @@ if os.name == 'nt':
     APPDATA_DIR = os.path.join(os.getenv('LOCALAPPDATA'), 'Spedycja')
     os.makedirs(APPDATA_DIR, exist_ok=True)
 else:
-    APPDATA_DIR = '/data'
-    if not os.path.exists(APPDATA_DIR):
-        os.makedirs(APPDATA_DIR)
+    APPDATA_DIR = '/var/data'
+    os.makedirs(APPDATA_DIR, exist_ok=True)
 
 # Pełne ścieżki do plików danych
 DATA_FILES = {
