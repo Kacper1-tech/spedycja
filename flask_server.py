@@ -9,8 +9,8 @@ if os.name == 'nt':
     APPDATA_DIR = os.path.join(os.getenv('LOCALAPPDATA'), 'Spedycja')
     os.makedirs(APPDATA_DIR, exist_ok=True)
 else:
-    APPDATA_DIR = '/var/data'
-    os.makedirs(APPDATA_DIR, exist_ok=True)
+    # Dla Render i innych systemów Linux – folder projektu
+    APPDATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Pełne ścieżki do plików danych
 DATA_FILES = {
