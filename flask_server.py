@@ -10,7 +10,8 @@ if os.name == 'nt':  # Windows
 else:  # Linux (Render)
     APPDATA_DIR = '/data'
 
-os.makedirs(APPDATA_DIR, exist_ok=True)
+if os.name == 'nt':
+    os.makedirs(APPDATA_DIR, exist_ok=True)
 
 
 # Pełne ścieżki do plików danych
