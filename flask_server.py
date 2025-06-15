@@ -5,8 +5,13 @@ import os
 app = Flask(__name__)
 
 # Ścieżka do folderu AppData\Local\Spedycja
-APPDATA_DIR = os.path.join(os.getenv('LOCALAPPDATA'), 'Spedycja')
+if os.name == 'nt':  # Windows
+    APPDATA_DIR = os.path.join(os.getenv('LOCALAPPDATA'), 'Spedycja')
+else:  # Linux (Render)
+    APPDATA_DIR = '/data'
+
 os.makedirs(APPDATA_DIR, exist_ok=True)
+
 
 # Pełne ścieżki do plików danych
 DATA_FILES = {
