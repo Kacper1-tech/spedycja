@@ -64,6 +64,14 @@ class TransportTab(ttk.Frame):
         right = ttk.LabelFrame(main, text="Zlecenia do przypisania")
         right.pack(side="right", fill="both", expand=True, padx=(5, 0))
 
+        # Pole filtrowania kierowców
+        filter_frame = ttk.Frame(left)
+        filter_frame.pack(fill="x", padx=5, pady=(0, 5))
+        ttk.Label(filter_frame, text="Filtruj kierowców:").pack(side="left")
+        self.filter_entry = ttk.Entry(filter_frame)
+        self.filter_entry.pack(side="left", padx=5)
+        self.filter_entry.bind("<KeyRelease>", self.filtruj_kierowcow)
+
         self.transport_table = ttk.Treeview(left, columns=("LP", "Kierowca", "Export", "Import", "Uwagi"),
                                             show="headings", height=20)
         for col, width in [("LP", 50), ("Kierowca", 160), ("Export", 160), ("Import", 160), ("Uwagi", 90)]:
@@ -309,4 +317,25 @@ class TransportTab(ttk.Frame):
 
         self.zapisz_transporty_na_serwerze(nowe_transporty)
         self.wczytaj_transporty_z_pliku()
+
+    def filtruj_kierowcow(self, event=None):
+        filtr = self.filter_entry.get().strip().lower()
+
+        wszystkie_transporty = self.pobierz_transporty_z_serwera()
+        self.transport_table.delete(*self.transport_table.get_children())
+
+        for t in wszystkie_transporty:
+            if t.get("separator", False):
+                continue  # Pomijamy separatory (np. daty)
+            kierowca = t.get("kierowca", "").lower()
+            if filtr in kierowca:
+                self.transport_table.insert("", "end", values=(
+                    t.get("lp", ""),
+                    t.get("kierowca", ""),
+                    t.get("export", ""),
+                    t.get("import", ""),
+                    t.get("uwagi", "")
+                ))
+
+    
 
