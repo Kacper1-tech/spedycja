@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import requests
 
-API_URL = 'https://spedycja.onrender.com/kierowcy'
+from supabase_client import supabase
+TABLE_NAME = "kierowcy"
 
 class KierowcyTab(ttk.Frame):
     def __init__(self, master, lp_counter, *args, **kwargs):
@@ -65,34 +65,32 @@ class KierowcyTab(ttk.Frame):
 
     def load_from_server(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
+            response = supabase.table(TABLE_NAME).select("*").execute()
+            data = response.data
 
             self.tree.delete(*self.tree.get_children())
             max_lp = 0
 
             for row in data:
-                if isinstance(row, dict):
-                    values = (
-                        row.get("lp", ""),
-                        row.get("imie_nazwisko", ""),
-                        row.get("tel_sluzbowy", ""),
-                        row.get("tel_prywatny", ""),
-                        row.get("dowod", "")
-                    )
-                    self.tree.insert("", "end", values=values)
+                values = (
+                    row.get("lp", ""),
+                    row.get("imie_nazwisko", ""),
+                    row.get("tel_sluzbowy", ""),
+                    row.get("tel_prywatny", ""),
+                    row.get("dowod", "")
+                )
+                self.tree.insert("", "end", values=values)
 
-                    try:
-                        max_lp = max(max_lp, int(row.get("lp", 0)))
-                    except Exception:
-                        pass
+                try:
+                    max_lp = max(max_lp, int(row.get("lp", 0)))
+                except Exception:
+                    pass
 
             if self.lp_counter is not None:
                 self.lp_counter["kierowcy"] = max_lp + 1
 
         except Exception as e:
-            messagebox.showerror("Błąd", f"Nie można wczytać danych z serwera:\n{e}")
+            messagebox.showerror("Błąd", f"Nie można wczytać danych z Supabase:\n{e}")
 
     def dodaj(self):
         imie_nazwisko = self.imie_nazwisko_var.get().strip()
@@ -114,8 +112,7 @@ class KierowcyTab(ttk.Frame):
         }
 
         try:
-            response = requests.post(API_URL, json=data)
-            response.raise_for_status()
+            supabase.table(TABLE_NAME).insert(data).execute()
             self.lp_counter["kierowcy"] = lp + 1
             self.load_from_server()
             self.czysc()
@@ -147,9 +144,7 @@ class KierowcyTab(ttk.Frame):
             "dowod": self.dowod_var.get()
         }
         try:
-            url = f"{API_URL}/{data['lp']}"
-            response = requests.put(url, json=data)
-            response.raise_for_status()
+            supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
             self.selected_item = None
             self.load_from_server()
             self.czysc()
@@ -167,9 +162,7 @@ class KierowcyTab(ttk.Frame):
             for item in selected:
                 values = self.tree.item(item, "values")
                 lp = values[0]
-                url = f"{API_URL}/{lp}"
-                response = requests.delete(url)
-                response.raise_for_status()
+                supabase.table(TABLE_NAME).delete().eq("lp", lp).execute()
             self.load_from_server()
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie można usunąć kierowcy:\n{e}")
@@ -182,28 +175,26 @@ class KierowcyTab(ttk.Frame):
 
     def auto_odswiez_kierowcow(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
+            response = supabase.table(TABLE_NAME).select("*").execute()
+            data = response.data
 
             self.tree.delete(*self.tree.get_children())
             max_lp = 0
 
             for row in data:
-                if isinstance(row, dict):
-                    values = (
-                        row.get("lp", ""),
-                        row.get("imie_nazwisko", ""),
-                        row.get("tel_sluzbowy", ""),
-                        row.get("tel_prywatny", ""),
-                        row.get("dowod", "")
-                    )
-                    self.tree.insert("", "end", values=values)
+                values = (
+                    row.get("lp", ""),
+                    row.get("imie_nazwisko", ""),
+                    row.get("tel_sluzbowy", ""),
+                    row.get("tel_prywatny", ""),
+                    row.get("dowod", "")
+                )
+                self.tree.insert("", "end", values=values)
 
-                    try:
-                        max_lp = max(max_lp, int(row.get("lp", 0)))
-                    except Exception:
-                        pass
+                try:
+                    max_lp = max(max_lp, int(row.get("lp", 0)))
+                except Exception:
+                    pass
 
             if self.lp_counter is not None:
                 self.lp_counter["kierowcy"] = max_lp + 1
