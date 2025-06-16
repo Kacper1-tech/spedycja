@@ -65,7 +65,11 @@ class CiezarowkiTab(ttk.Frame):
 
         for col in columns:
             self.tree.heading(col, text=col)
+<<<<<<< HEAD
             width = 50 if col == "LP" else 120
+=======
+            width = 60 if col == "LP" else 120
+>>>>>>> c725138683f82da931b7c454841cae98d193da82
             self.tree.column(col, anchor="center", width=width)
 
     def load_from_server(self):
