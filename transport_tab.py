@@ -22,6 +22,7 @@ class TransportTab(ttk.Frame):
         self.kierowca_entry.grid(row=0, column=1, padx=5, pady=2)
         ttk.Button(col1, text="Dodaj", command=self.dodaj_transport_z_kierowca).grid(row=0, column=2)
         ttk.Label(col1, text="Edytuj kierowcę:").grid(row=1, column=0, sticky="w")
+        ttk.Button(col1, text="Usuń", command=self.usun_kierowce).grid(row=0, column=3, padx=(5, 0))
         self.kierowca_input = ttk.Entry(col1, width=18)
         self.kierowca_input.grid(row=1, column=1, padx=5, pady=2)
         ttk.Button(col1, text="Zapisz", command=self.aktualizuj_kierowce).grid(row=1, column=2)
@@ -284,3 +285,28 @@ class TransportTab(ttk.Frame):
             print("❌ Błąd auto-odświeżania transportu:", e)
         finally:
             self.after(10000, self.auto_odswiez_tabela)
+
+    def usun_kierowce(self):
+        selected = self.transport_table.selection()
+        if not selected:
+            messagebox.showwarning("Brak zaznaczenia", "Zaznacz kierowcę do usunięcia.")
+            return
+
+        confirm = messagebox.askyesno("Potwierdzenie", "Czy na pewno chcesz usunąć zaznaczonego kierowcę?")
+        if not confirm:
+            return
+
+        transporty = self.pobierz_transporty_z_serwera()
+        nowe_transporty = []
+
+        zaznaczone_lp = [
+            self.transport_table.item(item, "values")[0] for item in selected
+        ]
+
+        for t in transporty:
+            if str(t.get("lp")) not in zaznaczone_lp:
+                nowe_transporty.append(t)
+
+        self.zapisz_transporty_na_serwerze(nowe_transporty)
+        self.wczytaj_transporty_z_pliku()
+
