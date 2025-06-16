@@ -1,0 +1,74 @@
+2025-06-16 10:46:40 - ❌ Błąd w zakładce Transport
+Traceback (most recent call last):
+  File "spedycja_gui.py", line 52, in __init__
+    self.transport_tab = TransportTab(self.notebook, self.lp_counter, self.zlecenia_lista)
+                         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "transport_tab.py", line 62, in __init__
+    filter_frame = ttk.Frame(left)
+                             ^^^^
+UnboundLocalError: cannot access local variable 'left' where it is not associated with a value
+
+2025-06-16 10:46:40 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                                                                 ^^^^^^^^^^^^^^^^^^
+  File "tkinter\__init__.py", line 2546, in __getattr__
+AttributeError: '_tkinter.tkapp' object has no attribute 'transport_tab'
+
+2025-06-16 10:47:44 - ❌ Błąd w zakładce Transport
+Traceback (most recent call last):
+  File "spedycja_gui.py", line 52, in __init__
+    self.transport_tab = TransportTab(self.notebook, self.lp_counter, self.zlecenia_lista)
+                         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "transport_tab.py", line 62, in __init__
+    filter_frame = ttk.Frame(left)
+                             ^^^^
+UnboundLocalError: cannot access local variable 'left' where it is not associated with a value
+
+2025-06-16 10:47:44 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                                                                 ^^^^^^^^^^^^^^^^^^
+  File "tkinter\__init__.py", line 2546, in __getattr__
+AttributeError: '_tkinter.tkapp' object has no attribute 'transport_tab'
+
+2025-06-16 10:48:33 - ❌ Błąd w zakładce Transport
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 52, in __init__
+    self.transport_tab = TransportTab(self.notebook, self.lp_counter, self.zlecenia_lista)
+                         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\transport_tab.py", line 62, in __init__
+    filter_frame = ttk.Frame(left)
+                             ^^^^
+UnboundLocalError: cannot access local variable 'left' where it is not associated with a value
+
+2025-06-16 10:48:33 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                                                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\tkinter\__init__.py", line 2546, in __getattr__
+    return getattr(self.tk, attr)
+AttributeError: '_tkinter.tkapp' object has no attribute 'transport_tab'
+
+2025-06-16 11:04:00 - ❌ Błąd w zakładce Transport
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 52, in __init__
+    self.transport_tab = TransportTab(self.notebook, self.lp_counter, self.zlecenia_lista)
+                         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\transport_tab.py", line 62, in __init__
+    filter_frame = ttk.Frame(left)
+                             ^^^^
+UnboundLocalError: cannot access local variable 'left' where it is not associated with a value
+
+2025-06-16 11:04:00 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                                                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python313\Lib\tkinter\__init__.py", line 2546, in __getattr__
+    return getattr(self.tk, attr)
+AttributeError: '_tkinter.tkapp' object has no attribute 'transport_tab'
+

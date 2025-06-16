@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: flask-spedycja
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: python flask_server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
