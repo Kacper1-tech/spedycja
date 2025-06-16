@@ -32,21 +32,13 @@ class TransportTab(ttk.Frame):
         self.export_input = ttk.Entry(col2, width=18)
         self.export_input.grid(row=0, column=1, padx=5, pady=2)
         ttk.Button(col2, text="Zapisz", command=self.aktualizuj_export).grid(row=0, column=2)
-        ttk.Label(col2, text="Edytuj export:").grid(row=1, column=0, sticky="w")
-        self.edit_export_entry = ttk.Entry(col2, width=18)
-        self.edit_export_entry.grid(row=1, column=1, padx=5, pady=2)
-        ttk.Button(col2, text="Zapisz", command=self.aktualizuj_export_edycja).grid(row=1, column=2)
-
+        
         col3 = ttk.Frame(fields_frame)
         col3.grid(row=0, column=2, padx=20, sticky="n")
         ttk.Label(col3, text="Import:").grid(row=0, column=0, sticky="w")
         self.import_input = ttk.Entry(col3, width=18)
         self.import_input.grid(row=0, column=1, padx=5, pady=2)
         ttk.Button(col3, text="Zapisz", command=self.aktualizuj_import).grid(row=0, column=2)
-        ttk.Label(col3, text="Edytuj import:").grid(row=1, column=0, sticky="w")
-        self.edit_import_entry = ttk.Entry(col3, width=18)
-        self.edit_import_entry.grid(row=1, column=1, padx=5, pady=2)
-        ttk.Button(col3, text="Zapisz", command=self.aktualizuj_import_edycja).grid(row=1, column=2)
 
         col4 = ttk.Frame(fields_frame)
         col4.grid(row=0, column=3, padx=20, sticky="n")
@@ -54,10 +46,6 @@ class TransportTab(ttk.Frame):
         self.uwagi_input = ttk.Entry(col4, width=18)
         self.uwagi_input.grid(row=0, column=1, padx=5, pady=2)
         ttk.Button(col4, text="Zapisz", command=self.aktualizuj_uwagi).grid(row=0, column=2)
-        ttk.Label(col4, text="Edytuj uwagi:").grid(row=1, column=0, sticky="w")
-        self.edit_uwagi_entry = ttk.Entry(col4, width=18)
-        self.edit_uwagi_entry.grid(row=1, column=1, padx=5, pady=2)
-        ttk.Button(col4, text="Zapisz", command=self.aktualizuj_uwagi_edycja).grid(row=1, column=2)
 
         data_frame = ttk.Frame(self)
         data_frame.pack(pady=(0, 10))
@@ -203,18 +191,6 @@ class TransportTab(ttk.Frame):
 
     def aktualizuj_uwagi(self):
         wartosc = self.uwagi_input.get().strip() or self.edit_uwagi_entry.get().strip()
-        self.aktualizuj_pole("Uwagi", wartosc)
-        
-    def aktualizuj_export_edycja(self):
-        wartosc = self.edit_export_entry.get().strip()
-        self.aktualizuj_pole("Export", wartosc)
-
-    def aktualizuj_import_edycja(self):
-        wartosc = self.edit_import_entry.get().strip()
-        self.aktualizuj_pole("Import", wartosc)
-
-    def aktualizuj_uwagi_edycja(self):
-        wartosc = self.edit_uwagi_entry.get().strip()
         self.aktualizuj_pole("Uwagi", wartosc)
 
     def odswiez_zlecenia(self):
