@@ -68,8 +68,10 @@ class NaczepyTab(ttk.Frame):
 
         for col in columns:
             self.tree.heading(col, text=col)
-            width = 50 if col == "LP" else 130
-            self.tree.column(col, anchor="center", width=width)
+            if col == "LP":
+                self.tree.column(col, anchor="center", width=50, stretch=False)
+            else:
+                self.tree.column(col, anchor="center", width=120)
 
         self.tree.pack(fill="both", expand=True)
 
