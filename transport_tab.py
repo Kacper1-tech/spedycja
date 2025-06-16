@@ -58,12 +58,6 @@ class TransportTab(ttk.Frame):
         main = ttk.Frame(self)
         main.pack(fill="both", expand=True, padx=10, pady=10)
 
-        left = ttk.LabelFrame(main, text="Transporty")
-        left.pack(side="left", fill="both", expand=True, padx=(0, 5))
-
-        right = ttk.LabelFrame(main, text="Zlecenia do przypisania")
-        right.pack(side="right", fill="both", expand=True, padx=(5, 0))
-
         # Pole filtrowania kierowców
         filter_frame = ttk.Frame(left)
         filter_frame.pack(fill="x", padx=5, pady=(0, 5))
@@ -71,6 +65,12 @@ class TransportTab(ttk.Frame):
         self.filter_entry = ttk.Entry(filter_frame)
         self.filter_entry.pack(side="left", padx=5)
         self.filter_entry.bind("<KeyRelease>", self.filtruj_kierowcow)
+
+        left = ttk.LabelFrame(main, text="Transporty")
+        left.pack(side="left", fill="both", expand=True, padx=(0, 5))
+
+        right = ttk.LabelFrame(main, text="Zlecenia do przypisania")
+        right.pack(side="right", fill="both", expand=True, padx=(5, 0))
 
         self.transport_table = ttk.Treeview(left, columns=("LP", "Kierowca", "Export", "Import", "Uwagi"),
                                             show="headings", height=20)
