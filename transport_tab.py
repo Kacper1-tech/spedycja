@@ -59,8 +59,8 @@ class TransportTab(ttk.Frame):
         main.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Pole filtrowania kierowców
-        filter_frame = ttk.Frame(left)
-        filter_frame.pack(fill="x", padx=5, pady=(0, 5))
+        filter_frame = ttk.Frame(main)
+        filter_frame.pack(anchor="w", padx=(0, 0), pady=(0, 5))
         ttk.Label(filter_frame, text="Filtruj kierowców:").pack(side="left")
         self.filter_entry = ttk.Entry(filter_frame)
         self.filter_entry.pack(side="left", padx=5)
