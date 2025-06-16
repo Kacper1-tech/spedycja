@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import requests
+from supabase_client import supabase
 
-API_URL = 'https://spedycja.onrender.com/zlecenia'  # Adres Twojego serwera Flask
+TABELA = "zlecenia"
 
 COLUMNS = [
     "Numer zlecenia", "Nazwa zleceniodawcy", "Data załadunku", "Miejsce załadunku",
@@ -20,8 +20,7 @@ class ZleceniaTab(tk.Frame):
         self.tworz_formularz()
         self.tworz_tabele()
         self.odswiez_tabele()
-        self.after(10000, self.auto_odswiez_tabele)  # Odświeżaj co 10 sekund
-
+        self.after(10000, self.auto_odswiez_tabele)
 
     def tworz_formularz(self):
         self.frame_form = tk.Frame(self)
@@ -34,8 +33,7 @@ class ZleceniaTab(tk.Frame):
             col = idx // rows_per_col
             row = idx % rows_per_col
 
-            lbl = tk.Label(self.frame_form, text=col_name)
-            lbl.grid(row=row*2, column=col, sticky="ew", pady=(5,0), padx=10)
+            tk.Label(self.frame_form, text=col_name).grid(row=row*2, column=col, sticky="ew", pady=(5,0), padx=10)
             entry = tk.Entry(self.frame_form, width=30, justify='center')
             entry.grid(row=row*2+1, column=col, pady=(0,5), sticky="ew", padx=10)
             self.entries[col_name] = entry
@@ -46,13 +44,9 @@ class ZleceniaTab(tk.Frame):
         self.frame_buttons = tk.Frame(self)
         self.frame_buttons.pack(padx=10, pady=(0,15))
 
-        btn_add = tk.Button(self.frame_buttons, text="Dodaj zlecenie", width=15, command=self.dodaj_zlecenie)
-        btn_edit = tk.Button(self.frame_buttons, text="Edytuj zlecenie", width=15, command=self.edytuj_zlecenie)
-        btn_delete = tk.Button(self.frame_buttons, text="Usuń zlecenie", width=15, command=self.usun_zlecenie)
-
-        btn_add.grid(row=0, column=0, padx=5)
-        btn_edit.grid(row=0, column=1, padx=5)
-        btn_delete.grid(row=0, column=2, padx=5)
+        tk.Button(self.frame_buttons, text="Dodaj zlecenie", width=15, command=self.dodaj_zlecenie).grid(row=0, column=0, padx=5)
+        tk.Button(self.frame_buttons, text="Edytuj zlecenie", width=15, command=self.edytuj_zlecenie).grid(row=0, column=1, padx=5)
+        tk.Button(self.frame_buttons, text="Usuń zlecenie", width=15, command=self.usun_zlecenie).grid(row=0, column=2, padx=5)
 
     def tworz_tabele(self):
         self.tree = ttk.Treeview(self, columns=COLUMNS, show="headings", height=10)
@@ -64,23 +58,19 @@ class ZleceniaTab(tk.Frame):
 
     def odswiez_tabele(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
+            response = supabase.table(TABELA).select("*").execute()
+            data = response.data
         except Exception as e:
-            messagebox.showerror("Błąd", f"Nie można pobrać danych z serwera:\n{e}")
-            data = []
+            messagebox.showerror("Błąd", f"Nie można pobrać danych z Supabase:\n{e}")
+            return
 
         self.tree.delete(*self.tree.get_children())
-        for index, zlecenie in enumerate(data):
+        for zlecenie in data:
             lp = zlecenie.get("lp")
             if not isinstance(lp, int) or lp <= 0:
-                continue  # pomiń zlecenia bez poprawnego lp
+                continue
             values = [zlecenie.get(col, "") for col in COLUMNS]
-            iid = str(lp)
-            if self.tree.exists(iid):
-                self.tree.delete(iid)
-            self.tree.insert("", "end", iid=iid, values=values)
+            self.tree.insert("", "end", iid=str(lp), values=values)
 
         self.selected_id = None
         self.czysc_formularz()
@@ -91,12 +81,16 @@ class ZleceniaTab(tk.Frame):
     def dodaj_zlecenie(self):
         dane = {col: self.entries[col].get() for col in COLUMNS}
         if not dane["Numer zlecenia"] or not dane["Nazwa zleceniodawcy"]:
-            messagebox.showwarning("Brak danych", "Wprowadź przynajmniej numer zlecenia i nazwę zleceniodawcy.")
+            messagebox.showwarning("Brak danych", "Wprowadź numer zlecenia i nazwę zleceniodawcy.")
             return
         try:
-            response = requests.post(API_URL, json=dane)
-            response.raise_for_status()
-            messagebox.showinfo("Sukces", "Zlecenie dodane na serwerze")
+            # Pobierz najwyższe LP i nadaj nowe
+            res = supabase.table(TABELA).select("lp").order("lp", desc=True).limit(1).execute()
+            max_lp = res.data[0]["lp"] if res.data else 0
+            dane["lp"] = max_lp + 1
+
+            supabase.table(TABELA).insert(dane).execute()
+            messagebox.showinfo("Sukces", "Zlecenie dodane.")
             self.odswiez_tabele()
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie można dodać zlecenia:\n{e}")
@@ -114,40 +108,29 @@ class ZleceniaTab(tk.Frame):
             self.czysc_formularz()
 
     def edytuj_zlecenie(self):
-        if self.selected_id is None:
+        if not self.selected_id:
             messagebox.showwarning("Brak zaznaczenia", "Wybierz zlecenie do edycji.")
-            return
-        
-        if not self.selected_id.isdigit():
-            messagebox.showerror("Błąd", "To zlecenie nie może być edytowane – nie ma przypisanego ID (lp).")
             return
 
         dane = {col: self.entries[col].get() for col in COLUMNS}
-        dane["lp"] = int(self.selected_id)  # dodaj pole lp!
-        
+        dane["lp"] = int(self.selected_id)
+
         try:
-            url = f"{API_URL}/{self.selected_id}"
-            response = requests.put(url, json=dane)
-            response.raise_for_status()
-            messagebox.showinfo("Sukces", "Zlecenie zaktualizowane na serwerze")
+            supabase.table(TABELA).update(dane).eq("lp", dane["lp"]).execute()
+            messagebox.showinfo("Sukces", "Zlecenie zaktualizowane.")
             self.odswiez_tabele()
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie można edytować zlecenia:\n{e}")
 
     def usun_zlecenie(self):
-        if self.selected_id is None:
+        if not self.selected_id:
             messagebox.showwarning("Brak zaznaczenia", "Wybierz zlecenie do usunięcia.")
             return
-        if not self.selected_id.isdigit():
-            messagebox.showerror("Błąd", "To zlecenie nie może być usunięte – brak ID (lp).")
-            return
 
-        if messagebox.askyesno("Potwierdzenie", "Czy na pewno chcesz usunąć zaznaczone zlecenie?"):
+        if messagebox.askyesno("Potwierdzenie", "Czy na pewno chcesz usunąć zlecenie?"):
             try:
-                url = f"{API_URL}/{self.selected_id}"
-                response = requests.delete(url)
-                response.raise_for_status()
-                messagebox.showinfo("Sukces", "Zlecenie usunięte na serwerze")
+                supabase.table(TABELA).delete().eq("lp", self.selected_id).execute()
+                messagebox.showinfo("Sukces", "Zlecenie usunięte.")
                 self.odswiez_tabele()
             except Exception as e:
                 messagebox.showerror("Błąd", f"Nie można usunąć zlecenia:\n{e}")
@@ -155,27 +138,10 @@ class ZleceniaTab(tk.Frame):
     def czysc_formularz(self):
         for entry in self.entries.values():
             entry.delete(0, tk.END)
-            
+
     def auto_odswiez_tabele(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
-
-            self.tree.delete(*self.tree.get_children())
-            for index, zlecenie in enumerate(data):
-                lp = zlecenie.get("lp")
-                if not isinstance(lp, int) or lp <= 0:
-                    continue  # pomiń zlecenia bez poprawnego lp
-                values = [zlecenie.get(col, "") for col in COLUMNS]
-                iid = str(lp)
-                if self.tree.exists(iid):
-                    self.tree.delete(iid)
-                self.tree.insert("", "end", iid=iid, values=values)
-
-            self.selected_id = None
-            if self.transport_tab:
-                self.transport_tab.aktualizuj_tabele_zlecen(data)
+            self.odswiez_tabele()
             print("🔄 Automatyczne odświeżenie zleceń")
         except Exception as e:
             print("❌ Błąd automatycznego odświeżania:", e)

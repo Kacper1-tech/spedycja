@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import requests
+from supabase_client import supabase
 
-API_URL = 'https://spedycja.onrender.com/kontrahenci'
+TABLE_NAME = "kontrahenci"
 
 class KontrahenciTab(ttk.Frame):
     def __init__(self, master, lp_counter, *args, **kwargs):
@@ -19,10 +19,9 @@ class KontrahenciTab(ttk.Frame):
 
         self.create_widgets()
         self.load_from_server()
-        self.after(10000, self.auto_odswiez_kontrahentow)  # Odświeżanie co 10 sek.
+        self.after(10000, self.auto_odswiez_kontrahentow)
 
     def create_widgets(self):
-        # ➤ Ramka do wyśrodkowania formularza tylko poziomo
         form_wrapper = ttk.Frame(self)
         form_wrapper.pack(fill="x", anchor="n", pady=10)
 
@@ -68,34 +67,30 @@ class KontrahenciTab(ttk.Frame):
             else:
                 self.tree.column(col, width=120, anchor="center")
 
-
     def load_from_server(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
+            response = supabase.table(TABLE_NAME).select("*").execute()
+            data = response.data
 
             self.tree.delete(*self.tree.get_children())
-
             for row in data:
-                if isinstance(row, dict):
-                    values = (
-                        row.get("lp", ""),
-                        row.get("nazwa", ""),
-                        row.get("ulica", ""),
-                        row.get("kod", ""),
-                        row.get("miasto", ""),
-                        row.get("panstwo", ""),
-                        row.get("nip", "")
-                    )
-                    self.tree.insert("", "end", values=values)
+                values = (
+                    row.get("lp", ""),
+                    row.get("nazwa", ""),
+                    row.get("ulica", ""),
+                    row.get("kod", ""),
+                    row.get("miasto", ""),
+                    row.get("panstwo", ""),
+                    row.get("nip", "")
+                )
+                self.tree.insert("", "end", values=values)
 
-            if data and self.lp_counter is not None:
-                max_lp = max(int(row.get("lp", 0)) for row in data if isinstance(row, dict))
+            if data:
+                max_lp = max(int(row.get("lp", 0)) for row in data)
                 self.lp_counter["kontrahenci"] = max_lp + 1
 
         except Exception as e:
-            messagebox.showerror("Błąd", f"Nie można wczytać danych z serwera:\n{e}")
+            messagebox.showerror("Błąd", f"Nie można wczytać danych z Supabase:\n{e}")
 
     def dodaj(self):
         if not self.nazwa_var.get().strip():
@@ -114,8 +109,7 @@ class KontrahenciTab(ttk.Frame):
         }
 
         try:
-            response = requests.post(API_URL, json=data)
-            response.raise_for_status()
+            supabase.table(TABLE_NAME).insert(data).execute()
             self.lp_counter["kontrahenci"] = lp + 1
             self.load_from_server()
             self.czysc()
@@ -151,9 +145,7 @@ class KontrahenciTab(ttk.Frame):
             "nip": self.nip_var.get()
         }
         try:
-            url = f"{API_URL}/{data['lp']}"
-            response = requests.put(url, json=data)
-            response.raise_for_status()
+            supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
             self.selected_item = None
             self.load_from_server()
             self.czysc()
@@ -171,9 +163,7 @@ class KontrahenciTab(ttk.Frame):
             for item in selected:
                 values = self.tree.item(item, "values")
                 lp = values[0]
-                url = f"{API_URL}/{lp}"
-                response = requests.delete(url)
-                response.raise_for_status()
+                supabase.table(TABLE_NAME).delete().eq("lp", lp).execute()
             self.load_from_server()
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie można usunąć kontrahenta:\n{e}")
@@ -185,30 +175,27 @@ class KontrahenciTab(ttk.Frame):
         self.miasto_var.set("")
         self.panstwo_var.set("")
         self.nip_var.set("")
-        
+
     def auto_odswiez_kontrahentow(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
+            response = supabase.table(TABLE_NAME).select("*").execute()
+            data = response.data
 
             self.tree.delete(*self.tree.get_children())
-
             for row in data:
-                if isinstance(row, dict):
-                    values = (
-                        row.get("lp", ""),
-                        row.get("nazwa", ""),
-                        row.get("ulica", ""),
-                        row.get("kod", ""),
-                        row.get("miasto", ""),
-                        row.get("panstwo", ""),
-                        row.get("nip", "")
-                    )
-                    self.tree.insert("", "end", values=values)
+                values = (
+                    row.get("lp", ""),
+                    row.get("nazwa", ""),
+                    row.get("ulica", ""),
+                    row.get("kod", ""),
+                    row.get("miasto", ""),
+                    row.get("panstwo", ""),
+                    row.get("nip", "")
+                )
+                self.tree.insert("", "end", values=values)
 
-            if data and self.lp_counter is not None:
-                max_lp = max(int(row.get("lp", 0)) for row in data if isinstance(row, dict))
+            if data:
+                max_lp = max(int(row.get("lp", 0)) for row in data)
                 self.lp_counter["kontrahenci"] = max_lp + 1
 
             print("🔄 Automatyczne odświeżenie kontrahentów")
@@ -216,4 +203,4 @@ class KontrahenciTab(ttk.Frame):
             print("❌ Błąd auto-odświeżania kontrahentów:", e)
         finally:
             self.after(10000, self.auto_odswiez_kontrahentow)
-
+s

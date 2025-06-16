@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import requests
 
-API_URL = 'https://spedycja.onrender.com/transport'  # Adres Twojego serwera Flask
+from supabase_client import supabase
+TABLE_NAME = "transport"
 
 class TransportTab(ttk.Frame):
     def __init__(self, master, lp_counter, zlecenia_lista, *args, **kwargs):
@@ -96,19 +96,20 @@ class TransportTab(ttk.Frame):
 
     def pobierz_transporty_z_serwera(self):
         try:
-            r = requests.get(API_URL)
-            r.raise_for_status()
-            return r.json()
+            response = supabase.table(TABLE_NAME).select("*").order("lp").execute()
+            return response.data
         except Exception as e:
-            messagebox.showerror("Błąd", f"Nie można pobrać transportów:\n{e}")
+            messagebox.showerror("Błąd", f"Nie można pobrać transportów z Supabase:\n{e}")
             return []
 
     def zapisz_transporty_na_serwerze(self, transporty):
         try:
-            r = requests.put(API_URL, json=transporty)
-            r.raise_for_status()
+            # Usuwamy wszystkie i wstawiamy ponownie (uproszczona strategia)
+            supabase.table(TABLE_NAME).delete().neq("id", 0).execute()
+            for t in transporty:
+                supabase.table(TABLE_NAME).insert(t).execute()
         except Exception as e:
-            messagebox.showerror("Błąd", f"Nie można zapisać transportów:\n{e}")
+            messagebox.showerror("Błąd", f"Nie można zapisać transportów do Supabase:\n{e}")
 
     def wczytaj_transporty_z_pliku(self):
         transporty = self.pobierz_transporty_z_serwera()

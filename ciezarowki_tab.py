@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import requests
 
-API_URL = 'https://spedycja.onrender.com/ciezarowki'
+from supabase_client import supabase
+TABLE_NAME = "ciezarowki"
 
 class CiezarowkiTab(ttk.Frame):
     def __init__(self, master, lp_counter, *args, **kwargs):
@@ -72,16 +72,13 @@ class CiezarowkiTab(ttk.Frame):
 
     def load_from_server(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
+            response = supabase.table(TABLE_NAME).select("*").execute()
+            data = response.data
 
             self.tree.delete(*self.tree.get_children())
             max_lp = 0
 
             for row in data:
-                if not isinstance(row, dict):
-                    continue
                 values = (
                     row.get("lp", ""),
                     row.get("rejestracja", ""),
@@ -94,7 +91,6 @@ class CiezarowkiTab(ttk.Frame):
                     row.get("poj_p", "")
                 )
                 self.tree.insert("", "end", values=values)
-
                 try:
                     max_lp = max(max_lp, int(row.get("lp", 0)))
                 except Exception:
@@ -103,7 +99,7 @@ class CiezarowkiTab(ttk.Frame):
             self.lp_counter["ciezarowki"] = max_lp + 1
 
         except Exception as e:
-            messagebox.showerror("Błąd", f"Nie można wczytać danych z serwera:\n{e}")
+            messagebox.showerror("Błąd", f"Nie można wczytać danych z Supabase:\n{e}")
 
     def dodaj(self):
         if not all([self.rej_var.get(), self.marka_var.get(), self.model_var.get(), self.vin_var.get(),
@@ -123,8 +119,7 @@ class CiezarowkiTab(ttk.Frame):
             "poj_p": self.poj_p_var.get(),
         }
         try:
-            response = requests.post(API_URL, json=data)
-            response.raise_for_status()
+            supabase.table(TABLE_NAME).insert(data).execute()
             self.lp_counter["ciezarowki"] = lp + 1
             self.load_from_server()
             self.czysc()
@@ -164,9 +159,7 @@ class CiezarowkiTab(ttk.Frame):
             "poj_p": self.poj_p_var.get(),
         }
         try:
-            url = f"{API_URL}/{data['lp']}"
-            response = requests.put(url, json=data)
-            response.raise_for_status()
+            supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
             self.selected_item = None
             self.load_from_server()
             self.czysc()
@@ -184,9 +177,7 @@ class CiezarowkiTab(ttk.Frame):
             for item in selected:
                 values = self.tree.item(item, "values")
                 lp = values[0]
-                url = f"{API_URL}/{lp}"
-                response = requests.delete(url)
-                response.raise_for_status()
+                supabase.table(TABLE_NAME).delete().eq("lp", lp).execute()
             self.load_from_server()
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie można usunąć ciężarówki:\n{e}")
@@ -198,16 +189,13 @@ class CiezarowkiTab(ttk.Frame):
 
     def auto_odswiez_ciezarowki(self):
         try:
-            response = requests.get(API_URL)
-            response.raise_for_status()
-            data = response.json()
+            response = supabase.table(TABLE_NAME).select("*").execute()
+            data = response.data
 
             self.tree.delete(*self.tree.get_children())
             max_lp = 0
 
             for row in data:
-                if not isinstance(row, dict):
-                    continue
                 values = (
                     row.get("lp", ""),
                     row.get("rejestracja", ""),
@@ -220,16 +208,15 @@ class CiezarowkiTab(ttk.Frame):
                     row.get("poj_p", "")
                 )
                 self.tree.insert("", "end", values=values)
-
                 try:
                     max_lp = max(max_lp, int(row.get("lp", 0)))
                 except Exception:
                     pass
 
             self.lp_counter["ciezarowki"] = max_lp + 1
-
             print("🔄 Automatyczne odświeżenie ciężarówek")
         except Exception as e:
             print("❌ Błąd auto-odświeżania ciężarówek:", e)
         finally:
             self.after(10000, self.auto_odswiez_ciezarowki)
+
