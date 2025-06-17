@@ -5,10 +5,24 @@ from supabase_client import supabase
 TABELA = "zlecenia"
 
 COLUMNS = [
-    "Numer zlecenia", "Nazwa zleceniodawcy", "Data załadunku", "Miejsce załadunku",
-    "Cło", "Wymiar towaru", "LDM", "Waga", "Miejsce rozładunku",
-    "Data rozładunku", "Cena"
+    "numer_zlecenia", "nazwa_zleceniodawcy", "data_zaladunku", "miejsce_zaladunku",
+    "clo", "wymiar_towaru", "ldm", "waga", "miejsce_rozladunku",
+    "data_rozladunku", "cena"
 ]
+
+FRIENDLY_NAMES = {
+    "numer_zlecenia": "Numer zlecenia",
+    "nazwa_zleceniodawcy": "Nazwa zleceniodawcy",
+    "data_zaladunku": "Data załadunku",
+    "miejsce_zaladunku": "Miejsce załadunku",
+    "clo": "Cło",
+    "wymiar_towaru": "Wymiar towaru",
+    "ldm": "LDM",
+    "waga": "Waga",
+    "miejsce_rozladunku": "Miejsce rozładunku",
+    "data_rozladunku": "Data rozładunku",
+    "cena": "Cena"
+}
 
 class ZleceniaTab(tk.Frame):
     def __init__(self, parent, transport_tab=None):
@@ -35,7 +49,7 @@ class ZleceniaTab(tk.Frame):
             col = idx // rows_per_col
             row = idx % rows_per_col
 
-            tk.Label(self.frame_form, text=col_name).grid(row=row*2, column=col, sticky="ew", pady=(5,0), padx=10)
+            tk.Label(self.frame_form, text=FRIENDLY_NAMES.get(col_name, col_name)).grid(row=row*2, column=col, sticky="ew", pady=(5,0), padx=10)
             entry = tk.Entry(self.frame_form, width=30, justify='center')
             entry.grid(row=row*2+1, column=col, pady=(0,5), sticky="ew", padx=10)
             self.entries[col_name] = entry
@@ -63,7 +77,7 @@ class ZleceniaTab(tk.Frame):
         self.tree.pack(fill="both", expand=True)
 
         for col in COLUMNS:
-            self.tree.heading(col, text=col)
+            self.tree.heading(col, text=FRIENDLY_NAMES.get(col, col))
             self.tree.column(col, width=120, anchor='center')
 
         self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
