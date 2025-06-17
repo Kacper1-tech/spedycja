@@ -134,20 +134,20 @@ class ZleceniaTab(tk.Frame):
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie można edytować zlecenia:\n{e}")
 
-        def zapisz_zlecenie(self):
-            if not self.selected_id:
-                messagebox.showwarning("Brak zaznaczenia", "Najpierw wybierz zlecenie do edycji.")
-                return
+    def zapisz_zlecenie(self):
+        if not self.selected_id:
+            messagebox.showwarning("Brak zaznaczenia", "Najpierw wybierz zlecenie do edycji.")
+            return
 
-            dane = {col: self.entries[col].get() for col in COLUMNS}
-            dane["lp"] = int(self.selected_id)
+        dane = {col: self.entries[col].get() for col in COLUMNS}
+        dane["lp"] = int(self.selected_id)
 
-            try:
-                supabase.table(TABELA).update(dane).eq("lp", dane["lp"]).execute()
-                messagebox.showinfo("Sukces", "Zlecenie zaktualizowane.")
-                self.odswiez_tabele()
-            except Exception as e:
-                messagebox.showerror("Błąd", f"Nie można zapisać zmian:\n{e}")
+        try:
+            supabase.table(TABELA).update(dane).eq("lp", dane["lp"]).execute()
+            messagebox.showinfo("Sukces", "Zlecenie zaktualizowane.")
+            self.odswiez_tabele()
+        except Exception as e:
+            messagebox.showerror("Błąd", f"Nie można zapisać zmian:\n{e}")
 
     def usun_zlecenie(self):
         if not self.selected_id:

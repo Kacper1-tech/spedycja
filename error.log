@@ -144,3 +144,16 @@ Traceback (most recent call last):
                                                                           ^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'ZleceniaTab' object has no attribute 'zapisz_zlecenie'
 
+2025-06-17 10:31:19 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "zlecenia_tab.py", line 20, in __init__
+    self.tworz_formularz()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "zlecenia_tab.py", line 51, in tworz_formularz
+    tk.Button(self.frame_buttons, text="Zapisz zmiany", width=15, command=self.zapisz_zlecenie).grid(row=0, column=2, padx=5)
+                                                                          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ZleceniaTab' object has no attribute 'zapisz_zlecenie'
+
