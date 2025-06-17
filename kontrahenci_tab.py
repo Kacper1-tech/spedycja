@@ -9,6 +9,7 @@ class KontrahenciTab(ttk.Frame):
         super().__init__(master, *args, **kwargs)
         self.lp_counter = lp_counter
         self.selected_item = None
+        self.editing = False
 
         self.nazwa_var = tk.StringVar()
         self.ulica_var = tk.StringVar()
@@ -133,6 +134,7 @@ class KontrahenciTab(ttk.Frame):
         self.miasto_var.set(values[4])
         self.panstwo_var.set(values[5])
         self.nip_var.set(values[6])
+        self.editing = True
 
     def zapisz(self):
         if not self.selected_item:
@@ -150,6 +152,7 @@ class KontrahenciTab(ttk.Frame):
         try:
             supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
             self.selected_item = None
+            self.editing = False
             self.load_from_server()
             self.czysc()
         except Exception as e:
@@ -180,6 +183,10 @@ class KontrahenciTab(ttk.Frame):
         self.nip_var.set("")
 
     def auto_odswiez_kontrahentow(self):
+        if self.editing:
+            print("⏸️ Pominięto odświeżenie – trwa edycja kontrahenta")
+            self.after(10000, self.auto_odswiez_kontrahentow)
+            return
         try:
             response = supabase.table(TABLE_NAME).select("*").execute()
             data = response.data

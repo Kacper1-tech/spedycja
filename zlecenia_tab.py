@@ -85,7 +85,11 @@ class ZleceniaTab(tk.Frame):
             self.tree.insert("", "end", iid=str(lp), values=values)
 
         self.selected_id = None
-        self.czysc_formularz()
+
+        # Nie czyść formularza, jeśli użytkownik coś w nim wpisuje
+        formularz_pusty = all(entry.get().strip() == "" for entry in self.entries.values())
+        if formularz_pusty:
+            self.czysc_formularz()
 
         if self.transport_tab:
             self.transport_tab.aktualizuj_tabele_zlecen(data)

@@ -9,6 +9,7 @@ class KierowcyTab(ttk.Frame):
         super().__init__(master, *args, **kwargs)
         self.lp_counter = lp_counter
         self.selected_item = None
+        self.editing = False 
 
         self.imie_nazwisko_var = tk.StringVar()
         self.tel_sluzbowy_var = tk.StringVar()
@@ -138,6 +139,7 @@ class KierowcyTab(ttk.Frame):
         self.tel_sluzbowy_var.set(values[2])
         self.tel_prywatny_var.set(values[3])
         self.dowod_var.set(values[4])
+        self.editing = True 
 
     def zapisz(self):
         if not self.selected_item:
@@ -153,6 +155,7 @@ class KierowcyTab(ttk.Frame):
         try:
             supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
             self.selected_item = None
+            self.editing = False
             self.load_from_server()
             self.czysc()
         except Exception as e:
@@ -181,6 +184,10 @@ class KierowcyTab(ttk.Frame):
         self.dowod_var.set("")
 
     def auto_odswiez_kierowcow(self):
+        if self.editing:
+            print("⏸️ Pominięto odświeżenie – trwa edycja kierowcy")
+            self.after(10000, self.auto_odswiez_kierowcow)
+            return
         try:
             response = supabase.table(TABLE_NAME).select("*").execute()
             data = response.data

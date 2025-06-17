@@ -22,6 +22,7 @@ class NaczepyTab(ttk.Frame):
         self.rodzaj_var = tk.StringVar()
 
         self.create_widgets()
+        self.editing = False  
         self.load_from_server()
         self.after(10000, self.auto_odswiez_naczepy)  # Odświeżanie co 10 sek.
 
@@ -146,6 +147,7 @@ class NaczepyTab(ttk.Frame):
         self.ubezpieczenie_var.set(values[6])
         self.typ_nadwozia_var.set(values[7])
         self.rodzaj_var.set(values[8])
+        self.editing = True  
 
     def zapisz(self):
         if not self.selected_item:
@@ -165,6 +167,7 @@ class NaczepyTab(ttk.Frame):
         try:
             supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
             self.selected_item = None
+            self.editing = False  
             self.load_from_server()
             self.czysc()
         except Exception as e:
@@ -194,6 +197,10 @@ class NaczepyTab(ttk.Frame):
             var.set("")
 
     def auto_odswiez_naczepy(self):
+        if self.editing:
+            print("⏸️ Pominięto odświeżenie – trwa edycja")
+            self.after(10000, self.auto_odswiez_naczepy)
+            return
         try:
             response = supabase.table(TABLE_NAME).select("*").execute()
             data = response.data

@@ -9,6 +9,7 @@ class CiezarowkiTab(ttk.Frame):
         super().__init__(master, *args, **kwargs)
         self.lp_counter = lp_counter
         self.selected_item = None
+        self.editing = False
 
         self.rej_var = tk.StringVar()
         self.marka_var = tk.StringVar()
@@ -152,6 +153,7 @@ class CiezarowkiTab(ttk.Frame):
         self.ubezpieczenie_var.set(values[6])
         self.poj_l_var.set(values[7])
         self.poj_p_var.set(values[8])
+        self.editing = True
 
     def zapisz(self):
         if not self.selected_item:
@@ -171,6 +173,7 @@ class CiezarowkiTab(ttk.Frame):
         try:
             supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
             self.selected_item = None
+            self.editing = False
             self.load_from_server()
             self.czysc()
         except Exception as e:
@@ -198,6 +201,10 @@ class CiezarowkiTab(ttk.Frame):
             var.set("")
 
     def auto_odswiez_ciezarowki(self):
+        if self.editing:
+            print("⏸️ Pominięto odświeżenie – trwa edycja ciężarówki")
+            self.after(10000, self.auto_odswiez_ciezarowki)
+            return
         try:
             response = supabase.table(TABLE_NAME).select("*").execute()
             data = response.data
