@@ -18,13 +18,15 @@ class ZleceniaTab(tk.Frame):
         self.transport_tab = transport_tab
 
         self.tworz_formularz()
-        self.tworz_tabele()
         self.odswiez_tabele()
         self.after(10000, self.auto_odswiez_tabele)
 
     def tworz_formularz(self):
-        self.frame_form = tk.Frame(self)
-        self.frame_form.pack(padx=10, pady=10)
+        content = tk.Frame(self, padx=10, pady=10)
+        content.pack(fill="both", expand=True)
+
+        self.frame_form = tk.Frame(content)
+        self.frame_form.pack(pady=5)
 
         cols = 4
         rows_per_col = 3
@@ -41,19 +43,29 @@ class ZleceniaTab(tk.Frame):
         for col in range(cols):
             self.frame_form.grid_columnconfigure(col, weight=1)
 
-        self.frame_buttons = tk.Frame(self)
-        self.frame_buttons.pack(padx=10, pady=(0,15))
+        self.frame_buttons = tk.Frame(content)
+        self.frame_buttons.pack(pady=(0, 15))
 
         tk.Button(self.frame_buttons, text="Dodaj zlecenie", width=15, command=self.dodaj_zlecenie).grid(row=0, column=0, padx=5)
         tk.Button(self.frame_buttons, text="Edytuj zlecenie", width=15, command=self.edytuj_zlecenie).grid(row=0, column=1, padx=5)
-        tk.Button(self.frame_buttons, text="Usuń zlecenie", width=15, command=self.usun_zlecenie).grid(row=0, column=2, padx=5)
+        tk.Button(self.frame_buttons, text="Zapisz zmiany", width=15, command=self.zapisz_zlecenie).grid(row=0, column=2, padx=5)
+        tk.Button(self.frame_buttons, text="Usuń zlecenie", width=15, command=self.usun_zlecenie).grid(row=0, column=3, padx=5)
 
-    def tworz_tabele(self):
-        self.tree = ttk.Treeview(self, columns=COLUMNS, show="headings", height=10)
+        # 👇 DODAJEMY TABELĘ DO TEGO SAMEGO `content`
+        table_frame = tk.Frame(content)
+        table_frame.pack(fill="both", expand=True)
+
+        scrollbar = ttk.Scrollbar(table_frame, orient="vertical")
+        scrollbar.pack(side="right", fill="y")
+
+        self.tree = ttk.Treeview(table_frame, columns=COLUMNS, show="headings", height=25, yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.tree.yview)
+        self.tree.pack(fill="both", expand=True)
+
         for col in COLUMNS:
             self.tree.heading(col, text=col)
             self.tree.column(col, width=120, anchor='center')
-        self.tree.pack(padx=10, pady=5, fill="both", expand=True)
+
         self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
     def odswiez_tabele(self):
@@ -121,6 +133,21 @@ class ZleceniaTab(tk.Frame):
             self.odswiez_tabele()
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie można edytować zlecenia:\n{e}")
+
+        def zapisz_zlecenie(self):
+            if not self.selected_id:
+                messagebox.showwarning("Brak zaznaczenia", "Najpierw wybierz zlecenie do edycji.")
+                return
+
+            dane = {col: self.entries[col].get() for col in COLUMNS}
+            dane["lp"] = int(self.selected_id)
+
+            try:
+                supabase.table(TABELA).update(dane).eq("lp", dane["lp"]).execute()
+                messagebox.showinfo("Sukces", "Zlecenie zaktualizowane.")
+                self.odswiez_tabele()
+            except Exception as e:
+                messagebox.showerror("Błąd", f"Nie można zapisać zmian:\n{e}")
 
     def usun_zlecenie(self):
         if not self.selected_id:

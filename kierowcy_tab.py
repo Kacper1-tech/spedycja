@@ -20,24 +20,25 @@ class KierowcyTab(ttk.Frame):
         self.after(10000, self.auto_odswiez_kierowcow)  # Odświeżanie co 10 sek.
 
     def create_widgets(self):
-        # ➤ Wyśrodkowana ramka formularza
-        form_wrapper = ttk.Frame(self)
-        form_wrapper.pack(fill="x", anchor="n", pady=10)
+        content = ttk.Frame(self, padding=10)
+        content.pack(fill="both", expand=True)
 
-        form_frame = ttk.Frame(form_wrapper, padding=20)
+        form_wrapper = ttk.Frame(content)
+        form_wrapper.pack(fill="x", anchor="n", pady=5)
+
+        form_frame = ttk.Frame(form_wrapper, padding=5)
         form_frame.pack()
 
         def create_field(label, var, row, col):
             ttk.Label(form_frame, text=label + ":").grid(row=row, column=col * 2, sticky="e", padx=5, pady=2)
             ttk.Entry(form_frame, textvariable=var, width=30).grid(row=row, column=col * 2 + 1, sticky="w", padx=5, pady=2)
 
-        # Dwie kolumny po dwa pola
         create_field("Imię i nazwisko", self.imie_nazwisko_var, 0, 0)
         create_field("Telefon służbowy", self.tel_sluzbowy_var, 0, 1)
         create_field("Telefon prywatny", self.tel_prywatny_var, 1, 0)
         create_field("Nr dowodu osobistego", self.dowod_var, 1, 1)
 
-        btn_frame = ttk.Frame(self)
+        btn_frame = ttk.Frame(content)
         btn_frame.pack(pady=10)
 
         ttk.Button(btn_frame, text="Dodaj kierowcę", command=self.dodaj).grid(row=0, column=0, padx=5)
@@ -45,15 +46,21 @@ class KierowcyTab(ttk.Frame):
         ttk.Button(btn_frame, text="Zapisz zmiany", command=self.zapisz).grid(row=0, column=2, padx=5)
         ttk.Button(btn_frame, text="Usuń zaznaczonego", command=self.usun).grid(row=0, column=3, padx=5)
 
-        table_frame = ttk.Frame(self)
+        table_frame = ttk.Frame(content)
         table_frame.pack(fill="both", expand=True)
 
         columns = ["LP", "Imię i nazwisko", "Tel. służbowy", "Tel. prywatny", "Nr dowodu"]
-        self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
-
-        tree_scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=tree_scroll.set)
+        tree_scroll = ttk.Scrollbar(table_frame)
         tree_scroll.pack(side="right", fill="y")
+
+        self.tree = ttk.Treeview(
+            table_frame,
+            columns=columns,
+            show="headings",
+            yscrollcommand=tree_scroll.set,
+            height=25
+        )
+        tree_scroll.config(command=self.tree.yview)
         self.tree.pack(fill="both", expand=True)
 
         for col in columns:

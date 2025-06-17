@@ -24,10 +24,13 @@ class CiezarowkiTab(ttk.Frame):
         self.after(10000, self.auto_odswiez_ciezarowki)  # Odświeżanie co 10 sek.
 
     def create_widgets(self):
-        form_wrapper = ttk.Frame(self)
-        form_wrapper.pack(fill="x", anchor="n", pady=10)
+        content = ttk.Frame(self, padding=20)
+        content.pack(fill="both", expand=True)
+        
+        form_wrapper = ttk.Frame(content)
+        form_wrapper.pack(fill="x", anchor="n", pady=5)
 
-        form_frame = ttk.Frame(form_wrapper, padding=20)
+        form_frame = ttk.Frame(form_wrapper, padding=5)
         form_frame.pack()
 
         def create_field(label, var, row, col):
@@ -44,7 +47,7 @@ class CiezarowkiTab(ttk.Frame):
         create_field("Poj. L baku", self.poj_l_var, 1, 2)
         create_field("Poj. P baku", self.poj_p_var, 1, 3)
 
-        btn_frame = ttk.Frame(self)
+        btn_frame = ttk.Frame(content)
         btn_frame.pack(pady=10)
 
         ttk.Button(btn_frame, text="Dodaj ciężarówkę", command=self.dodaj).grid(row=0, column=0, padx=5)
@@ -52,15 +55,22 @@ class CiezarowkiTab(ttk.Frame):
         ttk.Button(btn_frame, text="Zapisz zmiany", command=self.zapisz).grid(row=0, column=2, padx=5)
         ttk.Button(btn_frame, text="Usuń zaznaczoną", command=self.usun).grid(row=0, column=3, padx=5)
 
-        table_frame = ttk.Frame(self)
+        # ... dodaj po tym także:
+        table_frame = ttk.Frame(content)
         table_frame.pack(fill="both", expand=True)
 
         columns = ["LP", "Rejestracja", "Marka", "Model", "VIN", "Przegląd", "Ubezpieczenie", "Poj. L", "Poj. P"]
-        self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
-
-        tree_scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=tree_scroll.set)
+        tree_scroll = ttk.Scrollbar(table_frame)
         tree_scroll.pack(side="right", fill="y")
+
+        self.tree = ttk.Treeview(
+            table_frame,
+            columns=columns,
+            show="headings",
+            yscrollcommand=tree_scroll.set,
+            height=10
+        )
+        tree_scroll.config(command=self.tree.yview)
         self.tree.pack(fill="both", expand=True)
 
         for col in columns:

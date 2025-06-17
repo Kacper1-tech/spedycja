@@ -22,10 +22,13 @@ class KontrahenciTab(ttk.Frame):
         self.after(10000, self.auto_odswiez_kontrahentow)
 
     def create_widgets(self):
-        form_wrapper = ttk.Frame(self)
-        form_wrapper.pack(fill="x", anchor="n", pady=10)
+        content = ttk.Frame(self, padding=10)
+        content.pack(fill="both", expand=True)
 
-        form_frame = ttk.Frame(form_wrapper, padding=20)
+        form_wrapper = ttk.Frame(content)
+        form_wrapper.pack(fill="x", anchor="n", pady=5)
+
+        form_frame = ttk.Frame(form_wrapper, padding=5)
         form_frame.pack()
 
         def create_field(label, var, row, col):
@@ -41,7 +44,7 @@ class KontrahenciTab(ttk.Frame):
         create_field("Państwo", self.panstwo_var, 1, 1)
         create_field("NIP", self.nip_var, 1, 2)
 
-        btn_frame = ttk.Frame(self)
+        btn_frame = ttk.Frame(content)
         btn_frame.pack(pady=10)
 
         ttk.Button(btn_frame, text="Dodaj kontrahenta", command=self.dodaj).grid(row=0, column=0, padx=5)
@@ -49,15 +52,15 @@ class KontrahenciTab(ttk.Frame):
         ttk.Button(btn_frame, text="Zapisz zmiany", command=self.zapisz).grid(row=0, column=2, padx=5)
         ttk.Button(btn_frame, text="Usuń zaznaczonego", command=self.usun).grid(row=0, column=3, padx=5)
 
-        table_frame = ttk.Frame(self)
+        table_frame = ttk.Frame(content)
         table_frame.pack(fill="both", expand=True)
 
         columns = ["LP", "Nazwa firmy", "Ulica", "Kod", "Miasto", "Państwo", "NIP"]
-        self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=10)
-
-        tree_scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=tree_scroll.set)
+        tree_scroll = ttk.Scrollbar(table_frame, orient="vertical")
         tree_scroll.pack(side="right", fill="y")
+
+        self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", yscrollcommand=tree_scroll.set, height=25)
+        tree_scroll.config(command=self.tree.yview)
         self.tree.pack(fill="both", expand=True)
 
         for col in columns:
@@ -203,4 +206,3 @@ class KontrahenciTab(ttk.Frame):
             print("❌ Błąd auto-odświeżania kontrahentów:", e)
         finally:
             self.after(10000, self.auto_odswiez_kontrahentow)
-s

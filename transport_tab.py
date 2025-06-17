@@ -11,7 +11,9 @@ class TransportTab(ttk.Frame):
         self.zlecenia_lista = zlecenia_lista
 
         # GUI — pola i przyciski
-        fields_frame = ttk.Frame(self)
+        main_frame = ttk.Frame(self, padding=10)
+        main_frame.pack(fill="both", expand=True)
+        fields_frame = ttk.Frame(main_frame)
         fields_frame.pack(fill="x", pady=10)
         fields_frame.columnconfigure((0, 1, 2, 3), weight=1)
 
@@ -48,10 +50,11 @@ class TransportTab(ttk.Frame):
         self.uwagi_input.grid(row=0, column=1, padx=5, pady=2)
         ttk.Button(col4, text="Zapisz", command=self.aktualizuj_uwagi).grid(row=0, column=2)
 
-        data_frame = ttk.Frame(self)
-        data_frame.pack(pady=(0, 10))
+        data_frame = ttk.Frame(main_frame)
+        data_frame.pack(pady=(0, 5))  # mały margines
+
         ttk.Label(data_frame, text="Data:").pack(side="left", padx=(0, 5))
-        self.data_entry = ttk.Entry(data_frame, width=30)
+        self.data_entry = ttk.Entry(data_frame, width=18)
         self.data_entry.pack(side="left", padx=5)
         ttk.Button(data_frame, text="Dodaj datę", command=self.dodaj_date).pack(side="left", padx=5)
 
@@ -72,15 +75,29 @@ class TransportTab(ttk.Frame):
         right = ttk.LabelFrame(main, text="Zlecenia do przypisania")
         right.pack(side="right", fill="both", expand=True, padx=(5, 0))
 
-        self.transport_table = ttk.Treeview(left, columns=("LP", "Kierowca", "Export", "Import", "Uwagi"),
-                                            show="headings", height=20)
+        transport_scroll_frame = ttk.Frame(left)
+        transport_scroll_frame.pack(fill="both", expand=True)
+
+        scrollbar_left = ttk.Scrollbar(transport_scroll_frame, orient="vertical")
+        scrollbar_left.pack(side="right", fill="y")
+
+        self.transport_table = ttk.Treeview(
+            transport_scroll_frame,
+            columns=("LP", "Kierowca", "Export", "Import", "Uwagi"),
+            show="headings",
+            height=25,
+            yscrollcommand=scrollbar_left.set
+        )
+        scrollbar_left.config(command=self.transport_table.yview)
+
         for col, width in [("LP", 50), ("Kierowca", 160), ("Export", 160), ("Import", 160), ("Uwagi", 90)]:
             self.transport_table.heading(col, text=col)
             self.transport_table.column(col, anchor="center", width=width)
+
         self.transport_table.pack(fill="both", expand=True)
 
         self.zlecenia_table = ttk.Treeview(right, columns=("D.zał", "Zleceniodawca", "LDM", "Waga", "M.rozł.", "D.rozł.", "Cena"),
-                                           show="headings", height=20)
+                                           show="headings", height=25)
         for col in ("D.zał", "Zleceniodawca", "LDM", "Waga", "M.rozł.", "D.rozł.", "Cena"):
             self.zlecenia_table.heading(col, text=col)
             self.zlecenia_table.column(col, anchor="center", width=80)

@@ -72,3 +72,75 @@ Traceback (most recent call last):
     return getattr(self.tk, attr)
 AttributeError: '_tkinter.tkapp' object has no attribute 'transport_tab'
 
+2025-06-17 08:40:11 - ❌ Błąd w zakładce Ciężarówki
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 80, in __init__
+    self.ciezarowki_tab = CiezarowkiTab(self.notebook, self.lp_counter)
+                          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\ciezarowki_tab.py", line 22, in __init__
+    self.create_widgets()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\ciezarowki_tab.py", line 27, in create_widgets
+    form_wrapper = ttk.Frame(content)
+                             ^^^^^^^
+UnboundLocalError: cannot access local variable 'content' where it is not associated with a value
+
+2025-06-17 08:51:35 - ❌ Błąd w zakładce Kierowcy
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 73, in __init__
+    self.kierowcy_tab = KierowcyTab(self.notebook, self.lp_counter)
+                        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\kierowcy_tab.py", line 19, in __init__
+    self.load_from_server()
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'KierowcyTab' object has no attribute 'load_from_server'
+
+2025-06-17 09:19:05 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\zlecenia_tab.py", line 21, in __init__
+    self.tworz_tabele()
+    ^^^^^^^^^^^^^^^^^
+AttributeError: 'ZleceniaTab' object has no attribute 'tworz_tabele'
+
+2025-06-17 10:11:45 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\zlecenia_tab.py", line 20, in __init__
+    self.tworz_formularz()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\zlecenia_tab.py", line 51, in tworz_formularz
+    tk.Button(self.frame_buttons, text="Zapisz zmiany", width=15, command=self.zapisz_zlecenie).grid(row=0, column=2, padx=5)
+                                                                          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ZleceniaTab' object has no attribute 'zapisz_zlecenie'
+
+2025-06-17 10:14:36 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\zlecenia_tab.py", line 20, in __init__
+    self.tworz_formularz()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\zlecenia_tab.py", line 51, in tworz_formularz
+    tk.Button(self.frame_buttons, text="Zapisz zmiany", width=15, command=self.zapisz_zlecenie).grid(row=0, column=2, padx=5)
+                                                                          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ZleceniaTab' object has no attribute 'zapisz_zlecenie'
+
+2025-06-17 10:15:11 - ❌ Błąd w zakładce Zlecenia
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\spedycja_gui.py", line 59, in __init__
+    self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\zlecenia_tab.py", line 20, in __init__
+    self.tworz_formularz()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\admin\Desktop\Program Spedycyjny\spedycja\zlecenia_tab.py", line 51, in tworz_formularz
+    tk.Button(self.frame_buttons, text="Zapisz zmiany", width=15, command=self.zapisz_zlecenie).grid(row=0, column=2, padx=5)
+                                                                          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ZleceniaTab' object has no attribute 'zapisz_zlecenie'
+

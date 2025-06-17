@@ -14,6 +14,7 @@ class NaczepyTab(ttk.Frame):
         self.rej_var = tk.StringVar()
         self.marka_var = tk.StringVar()
         self.model_var = tk.StringVar()
+        self.model_var = tk.StringVar()
         self.vin_var = tk.StringVar()
         self.przeglad_var = tk.StringVar()
         self.ubezpieczenie_var = tk.StringVar()
@@ -29,10 +30,10 @@ class NaczepyTab(ttk.Frame):
         content.pack(fill="both", expand=True)
 
         form_outer = ttk.Frame(content)
-        form_outer.pack(pady=10)
+        form_outer.pack(pady=5)
         form_outer.columnconfigure(0, weight=1)
 
-        form_frame = ttk.Frame(form_outer)
+        form_frame = ttk.Frame(form_outer, padding=5)
         form_frame.grid(row=0, column=0)
         form_frame.columnconfigure((0, 1, 2, 3), weight=1)
 
