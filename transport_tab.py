@@ -394,6 +394,12 @@ class TransportTab(ttk.Frame):
         
     def auto_odswiez_tabela(self):
         try:
+            self.transport_table.tag_configure(
+                "separator",
+                background="#e0e0e0",
+                font=("Helvetica", 10, "bold")
+            )
+            
             # 🔍 Zapamiętaj zaznaczone ID i pozycję scrolla
             zaznaczone = self.transport_table.selection()
             zaznaczone_id = zaznaczone[0] if zaznaczone else None
@@ -415,12 +421,6 @@ class TransportTab(ttk.Frame):
                     ),
                     tags=tags
                 )
-                if "separator" in tags:
-                    self.transport_table.tag_configure(
-                        "separator",
-                        background="#e0e0e0",
-                        font=("Helvetica", 10, "bold")
-                    )
 
             # 🔁 Przywróć zaznaczenie i scroll
             if zaznaczone_id and self.transport_table.exists(zaznaczone_id):
