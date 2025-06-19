@@ -268,7 +268,7 @@ class TransportTab(ttk.Frame):
             "separator": True
         }
 
-        transporty.append(nowy)
+        transporty.insert(0, nowy)
 
         # 🔧 To zapisuje całą listę (z nowym wpisem) do Supabase
         self.zapisz_transporty_na_serwerze(transporty)
@@ -394,8 +394,15 @@ class TransportTab(ttk.Frame):
         
     def auto_odswiez_tabela(self):
         try:
+            # 🔍 Zapamiętaj zaznaczone ID i pozycję scrolla
+            zaznaczone = self.transport_table.selection()
+            zaznaczone_id = zaznaczone[0] if zaznaczone else None
+            yview = self.transport_table.yview()  # 🆕 Zapisz pozycję scrolla (tuple: (top, bottom))
+
+            # 🔄 Pobierz dane i odśwież tabelę
             transporty = self.pobierz_transporty_z_serwera()
             self.transport_table.delete(*self.transport_table.get_children())
+
             for t in transporty:
                 tags = ("separator",) if t.get("separator", False) else ()
                 self.transport_table.insert(
@@ -414,7 +421,15 @@ class TransportTab(ttk.Frame):
                         background="#e0e0e0",
                         font=("Helvetica", 10, "bold")
                     )
-            print("🔄 Automatyczne odświeżenie transportu")
+
+            # 🔁 Przywróć zaznaczenie i scroll
+            if zaznaczone_id and self.transport_table.exists(zaznaczone_id):
+                self.transport_table.selection_set(zaznaczone_id)
+                self.transport_table.see(zaznaczone_id)
+
+            self.transport_table.yview_moveto(yview[0])  # 🆕 Przywróć pozycję scrolla (top edge)
+
+            print("🔄 Automatyczne odświeżenie transportu (z zaznaczeniem i scrollem)")
         except Exception as e:
             print("❌ Błąd auto-odświeżania transportu:", e)
         finally:
