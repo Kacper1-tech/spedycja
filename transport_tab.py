@@ -11,8 +11,8 @@ class TransportTab(ttk.Frame):
         super().__init__(master, *args, **kwargs)
         self.zlecenia_lista = zlecenia_lista
         self.ukryte_zlecenia = []
-        self.SZEROKOSC_LEWEJ = 600
-        self.SZEROKOSC_PRAWEJ = 600
+        self.SZEROKOSC_LEWEJ = 650
+        self.SZEROKOSC_PRAWEJ = 550
 
         # GUI — pola i przyciski
         main_frame = ttk.Frame(self, padding=10)
@@ -83,7 +83,7 @@ class TransportTab(ttk.Frame):
         ttk.Button(right_filter, text="Usuń zlecenie", command=self.usun_zlecenie_z_transportu).pack()
 
         left = ttk.LabelFrame(main, text="Transporty", width=self.SZEROKOSC_LEWEJ)
-        left.pack(side="left", fill="y", padx=(10, 5))
+        left.pack(side="left", fill="both", expand=False, padx=(10, 5))
         left.pack_propagate(False)
 
         transport_scroll_frame = ttk.Frame(left)
@@ -102,7 +102,7 @@ class TransportTab(ttk.Frame):
         )
         scrollbar_left.config(command=self.transport_table.yview)
 
-        for col, width in [("Kierowca", 120), ("Export", 185), ("Import", 185), ("Uwagi", 90)]:
+        for col, width in [("Kierowca", 120), ("Export", 210), ("Import", 210), ("Uwagi", 90)]:
             self.transport_table.heading(col, text=col)
             self.transport_table.column(col, anchor="center", width=width)
 
