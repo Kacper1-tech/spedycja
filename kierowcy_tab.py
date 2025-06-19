@@ -85,7 +85,7 @@ class KierowcyTab(ttk.Frame):
                     row.get("imie_nazwisko", ""),
                     row.get("tel_sluzbowy", ""),
                     row.get("tel_prywatny", ""),
-                    row.get("dowod", "")
+                    row.get("nr_dowodu", "")
                 )
                 self.tree.insert("", "end", values=values)
 
@@ -116,7 +116,7 @@ class KierowcyTab(ttk.Frame):
             "imie_nazwisko": imie_nazwisko,
             "tel_sluzbowy": tel_sluzbowy,
             "tel_prywatny": tel_prywatny,
-            "dowod": dowod
+            "nr_dowodu": dowod
         }
 
         try:
@@ -150,7 +150,7 @@ class KierowcyTab(ttk.Frame):
             "imie_nazwisko": self.imie_nazwisko_var.get(),
             "tel_sluzbowy": self.tel_sluzbowy_var.get(),
             "tel_prywatny": self.tel_prywatny_var.get(),
-            "dowod": self.dowod_var.get()
+            "nr_dowodu": self.dowod_var.get()
         }
         try:
             supabase.table(TABLE_NAME).update(data).eq("lp", data["lp"]).execute()
@@ -201,7 +201,7 @@ class KierowcyTab(ttk.Frame):
                     row.get("imie_nazwisko", ""),
                     row.get("tel_sluzbowy", ""),
                     row.get("tel_prywatny", ""),
-                    row.get("dowod", "")
+                    row.get("nr_dowodu", "")
                 )
                 self.tree.insert("", "end", values=values)
 

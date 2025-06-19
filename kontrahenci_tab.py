@@ -56,7 +56,7 @@ class KontrahenciTab(ttk.Frame):
         table_frame = ttk.Frame(content)
         table_frame.pack(fill="both", expand=True)
 
-        columns = ["LP", "Nazwa firmy", "Ulica", "Kod", "Miasto", "Państwo", "NIP"]
+        columns = ["LP", "Nazwa firmy", "Ulica", "Kod pocztowy", "Miasto", "Państwo", "NIP"]
         tree_scroll = ttk.Scrollbar(table_frame, orient="vertical")
         tree_scroll.pack(side="right", fill="y")
 
@@ -80,9 +80,9 @@ class KontrahenciTab(ttk.Frame):
             for row in data:
                 values = (
                     row.get("lp", ""),
-                    row.get("nazwa", ""),
+                    row.get("nazwa_firmy", ""),
                     row.get("ulica", ""),
-                    row.get("kod", ""),
+                    row.get("kod_pocztowy", ""),
                     row.get("miasto", ""),
                     row.get("panstwo", ""),
                     row.get("nip", "")
@@ -104,9 +104,9 @@ class KontrahenciTab(ttk.Frame):
         lp = self.lp_counter.get("kontrahenci", 1)
         data = {
             "lp": lp,
-            "nazwa": self.nazwa_var.get(),
+            "nazwa_firmy": self.nazwa_var.get(),
             "ulica": self.ulica_var.get(),
-            "kod": self.kod_var.get(),
+            "kod_pocztowy": self.kod_var.get(),
             "miasto": self.miasto_var.get(),
             "panstwo": self.panstwo_var.get(),
             "nip": self.nip_var.get()
@@ -142,9 +142,9 @@ class KontrahenciTab(ttk.Frame):
         values = self.tree.item(self.selected_item, "values")
         data = {
             "lp": values[0],
-            "nazwa": self.nazwa_var.get(),
+            "nazwa_firmy": self.nazwa_var.get(),
             "ulica": self.ulica_var.get(),
-            "kod": self.kod_var.get(),
+            "kod_pocztowy": self.kod_var.get(),
             "miasto": self.miasto_var.get(),
             "panstwo": self.panstwo_var.get(),
             "nip": self.nip_var.get()
@@ -197,7 +197,7 @@ class KontrahenciTab(ttk.Frame):
                     row.get("lp", ""),
                     row.get("nazwa", ""),
                     row.get("ulica", ""),
-                    row.get("kod", ""),
+                    row.get("kod_pocztowy", ""),
                     row.get("miasto", ""),
                     row.get("panstwo", ""),
                     row.get("nip", "")

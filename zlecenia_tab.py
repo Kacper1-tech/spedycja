@@ -109,8 +109,9 @@ class ZleceniaTab(tk.Frame):
             self.transport_tab.aktualizuj_tabele_zlecen(data)
 
     def dodaj_zlecenie(self):
+        print("➡️ Kliknięto DODAJ ZLECENIE")
         dane = {col: self.entries[col].get() for col in COLUMNS}
-        if not dane["Numer zlecenia"] or not dane["Nazwa zleceniodawcy"]:
+        if not dane["numer_zlecenia"] or not dane["nazwa_zleceniodawcy"]:
             messagebox.showwarning("Brak danych", "Wprowadź numer zlecenia i nazwę zleceniodawcy.")
             return
         try:

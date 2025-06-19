@@ -83,7 +83,7 @@ class CiezarowkiTab(ttk.Frame):
 
     def load_from_server(self):
         try:
-            response = supabase.table(TABLE_NAME).select("*").execute()
+            response = supabase.table(TABLE_NAME).select("*").order("lp", desc=False).execute()
             data = response.data
 
             self.tree.delete(*self.tree.get_children())
@@ -206,7 +206,7 @@ class CiezarowkiTab(ttk.Frame):
             self.after(10000, self.auto_odswiez_ciezarowki)
             return
         try:
-            response = supabase.table(TABLE_NAME).select("*").execute()
+            response = supabase.table(TABLE_NAME).select("*").order("lp", desc=False).execute()
             data = response.data
 
             self.tree.delete(*self.tree.get_children())

@@ -49,15 +49,18 @@ class SpedycjaApp(tk.Tk):
         # Dodawanie zakładek z obsługą błędów
         try:
             print("🔄 Ładowanie zakładki: Transport")
-            self.transport_tab = TransportTab(self.notebook, self.lp_counter, self.zlecenia_lista)
+            self.transport_tab = TransportTab(self.notebook, self.zlecenia_lista)
             self.notebook.add(self.transport_tab, text="Transport")
         except Exception as e:
             log_error("❌ Błąd w zakładce Transport", e)
 
         try:
             print("🔄 Ładowanie zakładki: Zlecenia")
-            self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
-            self.notebook.add(self.zlecenia_tab, text="Zlecenia")
+            if hasattr(self, "transport_tab"):
+                self.zlecenia_tab = ZleceniaTab(self.notebook, transport_tab=self.transport_tab)
+                self.notebook.add(self.zlecenia_tab, text="Zlecenia")
+            else:
+                raise Exception("Zakładka Transport nie została załadowana – brak self.transport_tab")
         except Exception as e:
             log_error("❌ Błąd w zakładce Zlecenia", e)
 
