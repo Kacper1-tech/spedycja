@@ -6,6 +6,22 @@ import uuid
 from supabase_client import supabase
 TABLE_NAME = "transport"
 
+from datetime import datetime
+import re
+
+from datetime import datetime
+import re
+
+def wyciagnij_date(zlec):
+    tekst = zlec.get("data_zaladunku", "")
+    match = re.search(r"(\d{2}\.\d{2}\.\d{4})", tekst)
+    if match:
+        try:
+            return datetime.strptime(match.group(1), "%d.%m.%Y")
+        except ValueError:
+            pass
+    return datetime.max  # jeśli brak daty – sortuj na końcu
+
 class TransportTab(ttk.Frame):
     def __init__(self, master, zlecenia_lista, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
@@ -121,17 +137,28 @@ class TransportTab(ttk.Frame):
         right.pack(fill="both", expand=True)
         right.pack_propagate(False)
 
-        self.zlecenia_table = ttk.Treeview(right, columns=("D.zał", "Zleceniodawca", "LDM", "Waga", "M.rozł.", "D.rozł.", "Cena"),
+        columns = [
+            ("D.zał", 120),
+            ("Zleceniodawca", 80),
+            ("LDM", 50),
+            ("Waga", 50),
+            ("M.rozł.", 90),
+            ("D.rozł.", 120),
+            ("Cena", 40)
+        ]
+
+        self.zlecenia_table = ttk.Treeview(right, columns=[col for col, _ in columns],
                                            show="headings", height=25)
-        for col in ("D.zał", "Zleceniodawca", "LDM", "Waga", "M.rozł.", "D.rozł.", "Cena"):
+        for col, width in columns:
             self.zlecenia_table.heading(col, text=col)
-            self.zlecenia_table.column(col, anchor="center", width=80)
+            self.zlecenia_table.column(col, anchor="center", width=width)
         self.zlecenia_table.pack(fill="both", expand=True)
 
         self.dragging_item = None
         self.transport_table.bind("<ButtonPress-1>", self.start_drag)
         self.transport_table.bind("<B1-Motion>", self.drag_motion)
         self.transport_table.bind("<ButtonRelease-1>", self.stop_drag)
+        self.transport_table.bind("<<TreeviewSelect>>", self.on_transport_select)
 
         self.odswiez_zlecenia()
         self.wczytaj_transporty_z_pliku()
@@ -312,15 +339,15 @@ class TransportTab(ttk.Frame):
         self.aktualizuj_pole("Kierowca", self.kierowca_input.get())
 
     def aktualizuj_export(self):
-        wartosc = self.export_input.get().strip() or self.edit_export_entry.get().strip()
+        wartosc = self.export_input.get().strip()
         self.aktualizuj_pole("Export", wartosc)
 
     def aktualizuj_import(self):
-        wartosc = self.import_input.get().strip() or self.edit_import_entry.get().strip()
+        wartosc = self.import_input.get().strip()
         self.aktualizuj_pole("Import", wartosc)
 
     def aktualizuj_uwagi(self):
-        wartosc = self.uwagi_input.get().strip() or self.edit_uwagi_entry.get().strip()
+        wartosc = self.uwagi_input.get().strip()
         self.aktualizuj_pole("Uwagi", wartosc)
 
     def odswiez_zlecenia(self):
@@ -342,22 +369,46 @@ class TransportTab(ttk.Frame):
         self.zlecenia_lista.clear()
         self.zlecenia_table.delete(*self.zlecenia_table.get_children())
 
-        for zlec in lista_zlecen:
-            # Mapowanie pól z bazy na te, które wyświetlamy
-            rekord = {
-                "Data załadunku": zlec.get("data_zaladunku", ""),
-                "Nazwa zleceniodawcy": zlec.get("nazwa_zleceniodawcy", ""),
-                "LDM": zlec.get("ldm", ""),
-                "Waga": zlec.get("waga", ""),
-                "Miejsce rozładunku": zlec.get("miejsce_rozladunku", ""),
-                "Data rozładunku": zlec.get("data_rozladunku", ""),
-                "Cena": zlec.get("cena", "")
-            }
-            rekord_tuple = tuple(rekord.values())
-            if rekord_tuple not in self.ukryte_zlecenia:
-                self.zlecenia_table.insert("", "end", values=rekord_tuple)
-            if rekord_tuple not in self.ukryte_zlecenia:
-                self.zlecenia_lista.append(rekord)
+        # ✅ Sortuj eksporty i importy osobno
+        eksporty = [z for z in lista_zlecen if z.get("typ") != "import"]
+        importy = [z for z in lista_zlecen if z.get("typ") == "import"]
+
+        eksporty = sorted(eksporty, key=wyciagnij_date)
+        importy = sorted(importy, key=wyciagnij_date)
+
+        # ➕ Dodaj eksporty
+        for zlec in eksporty:
+            rekord = (
+                zlec.get("data_zaladunku", ""),
+                zlec.get("nazwa_zleceniodawcy", ""),
+                zlec.get("ldm", ""),
+                zlec.get("waga", ""),
+                zlec.get("miejsce_rozladunku", ""),
+                zlec.get("data_rozladunku", ""),
+                zlec.get("cena", "")
+            )
+            if rekord not in self.ukryte_zlecenia:
+                self.zlecenia_table.insert("", "end", values=rekord)
+                self.zlecenia_lista.append(zlec)
+
+        # ➖ Separator: Importy
+        self.zlecenia_table.insert("", "end", values=("", "", "", "IMPORTY", "", "", ""), tags=("separator",))
+        self.zlecenia_table.tag_configure("separator", background="#e0e0e0", font=("Helvetica", 10, "bold"))
+
+        # ➕ Dodaj importy
+        for zlec in importy:
+            rekord = (
+                zlec.get("data_zaladunku", ""),
+                zlec.get("nazwa_zleceniodawcy", ""),
+                zlec.get("ldm", ""),
+                zlec.get("waga", ""),
+                zlec.get("miejsce_rozladunku", ""),
+                zlec.get("data_rozladunku", ""),
+                zlec.get("cena", "")
+            )
+            if rekord not in self.ukryte_zlecenia:
+                self.zlecenia_table.insert("", "end", values=rekord)
+                self.zlecenia_lista.append(zlec)
 
     def start_drag(self, event):
         region = self.transport_table.identify("region", event.x, event.y)
@@ -537,3 +588,21 @@ class TransportTab(ttk.Frame):
         row_height = 20  # typowa wysokość wiersza (można dostosować)
         rows = int(transport_height / row_height)
         self.zlecenia_table.configure(height=max(rows - 1, 5))
+        
+    def on_transport_select(self, event):
+        selected = self.transport_table.selection()
+        if selected:
+            item_id = selected[0]
+            values = self.transport_table.item(item_id, "values")
+            if len(values) >= 4:
+                self.kierowca_input.delete(0, tk.END)
+                self.kierowca_input.insert(0, values[0])
+
+                self.export_input.delete(0, tk.END)
+                self.export_input.insert(0, values[1])
+
+                self.import_input.delete(0, tk.END)
+                self.import_input.insert(0, values[2])
+
+                self.uwagi_input.delete(0, tk.END)
+                self.uwagi_input.insert(0, values[3])
